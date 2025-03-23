@@ -27,6 +27,7 @@ _为你的 [nonebot2](https://github.com/nonebot/nonebot2) 插件提供 LLM 接�
 - 🛠️ **可扩展**：提供灵活的 config 与 prompt 设置
 - 🏗️ **易用性**：简单的 API 设计，方便上手  
 
+
 ## 📦 安装  
 
 ### 方式 1：通过 pip 安装
@@ -37,6 +38,16 @@ pip install nonebot-plugin-anywhere-llm
 
 
 ## 🚀 快速使用
+
+### 配置
+`.env`
+```conf
+OPENAI_API_KEY="sk-ivwnsnscugorsxqvncgbysxkcsnkccwagebmdqoluuwjlkmk"
+OPENAI_MODEL="deepseek-ai/DeepSeek-R1-Distill-Qwen-7B"
+OPENAI_BASE_URL="https://api.siliconflow.cn/v1"   # 代理地址
+```
+
+### 插件内使用
 ```python
 
 LLMService = require('nonebot_anywhere_llm').LLMService
