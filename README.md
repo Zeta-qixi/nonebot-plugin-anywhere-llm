@@ -8,7 +8,7 @@
 # nonebot-plugin-anywhere-llm
 
 
-_✨ [Nonebot2](https://github.com/nonebot/nonebot2) 为nonebot插件提供 LLM 接口 ✨_
+_为你的 [nonebot2](https://github.com/nonebot/nonebot2) 插件提供 LLM 接口_
 
 <p align="center">
   <img src="https://img.shields.io/github/license/Zeta-qixi/nonebot-plugin-anywhere-llm" alt="license">
