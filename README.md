@@ -1,8 +1,8 @@
 
 <div align="center">
 
-  <a href="https://github.com/Zeta-qixi/nonebot-plugin-anywhere-llm/">
-    <img src="https://github.com/Zeta-qixi/nonebot-plugin-anywhere-llm/blob/main/assets/logo.jpg" width="200">
+  <a href="https://nonebot.dev/">
+    <img src="https://nonebot.dev/logo.png" width="200" height="200" alt="nonebot">
   </a>
 
 # nonebot-plugin-anywhere-llm
