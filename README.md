@@ -1,5 +1,8 @@
 
-# ![Project Logo](https://github.com/Zeta-qixi/nonebot-plugin-anywhere-llm/blob/main/assets/logo.jpg)  
+
+<center>
+<img src="https://github.com/Zeta-qixi/nonebot-plugin-anywhere-llm/blob/main/assets/logo.jpg" width="200">
+</center>
 # nonebot-anywhere-llm  
 
 > 为nonebot插件提供 LLM 接口
