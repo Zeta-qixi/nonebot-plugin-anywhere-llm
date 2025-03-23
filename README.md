@@ -1,15 +1,25 @@
 
+<div align="center">
 
-<center>
-<img src="https://github.com/Zeta-qixi/nonebot-plugin-anywhere-llm/blob/main/assets/logo.jpg" width="200">
-</center>
-# nonebot-anywhere-llm  
+  <a href="https://github.com/Zeta-qixi/nonebot-plugin-anywhere-llm/">
+    <img src="https://github.com/Zeta-qixi/nonebot-plugin-anywhere-llm/blob/main/assets/logo.jpg" width="200">
+  </a>
 
-> 为nonebot插件提供 LLM 接口
+# nonebot-plugin-anywhere-llm
 
-[![License](https://img.shields.io/github/license/Zeta-qixi/nonebot-plugin-anywhere-llm)](LICENSE)  
-[![Stars](https://img.shields.io/github/stars/Zeta-qixi/nonebot-plugin-anywhere-llm)](https://github.com/Zeta-qixi/nonebot-plugin-anywhere-llm/stargazers)  
-[![Issues](https://img.shields.io/github/issues/Zeta-qixi/nonebot-plugin-anywhere-llm)](https://github.com/Zeta-qixi/nonebot-plugin-anywhere-llm/issues)  
+
+_✨ [Nonebot2](https://github.com/nonebot/nonebot2) 为nonebot插件提供 LLM 接口 ✨_
+
+<p align="center">
+  <img src="https://img.shields.io/github/license/Zeta-qixi/nonebot-plugin-anywhere-llm" alt="license">
+  <img src="https://img.shields.io/badge/python-3.9+-blue.svg" alt="Python">
+  <img src="https://img.shields.io/badge/nonebot-2.4.0+-red.svg" alt="NoneBot">
+
+</p>
+
+</div>
+
+
 
 ## ✨ 特性  
 
