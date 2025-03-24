@@ -2,16 +2,15 @@ from .interface import BaseLLMProvider
 from ..models import LLMParams
 from openai import APIError, APITimeoutError, AsyncOpenAI, AuthenticationError
 from nonebot import  logger
-from nonebot import get_driver
 from typing import Any, List, Tuple
-
+from ..config import llm_config
 
 class OpenAIProvider(BaseLLMProvider):
     def __init__(self, api_key: str = None, base_url: str = None):
-        config = get_driver().config
+        
         self.client = AsyncOpenAI(
-            api_key = api_key or getattr(config, "openai_api_key"), 
-            base_url = base_url or getattr(config, "openai_base_url")
+            api_key = api_key or llm_config.openai_api_key, 
+            base_url = base_url or llm_config.openai_base_url
         )
       
 

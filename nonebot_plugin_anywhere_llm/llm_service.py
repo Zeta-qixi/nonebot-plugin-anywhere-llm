@@ -1,12 +1,12 @@
 from nonebot import get_driver, require
 from typing import Dict, List, Optional, Union
-from nonebot.adapters.onebot.v11 import MessageEvent
+from nonebot.adapters import Event
+
 from .provider import OpenAIProvider
 from .history_manager import SQLiteHistoryManager
 from .models import LLMParams
 
 # LLMService.py
-
 
 class LLMService:
     def __init__(self, llm_param = None, history_mgr= None):
@@ -21,7 +21,7 @@ class LLMService:
         prompt: str,
         param: LLMParams = None,
         session_id: str = None,
-        event: MessageEvent = None,
+        event: Event = None,
         use_histroy: bool = False,
         histroy_length: int = 10
     ) -> str:

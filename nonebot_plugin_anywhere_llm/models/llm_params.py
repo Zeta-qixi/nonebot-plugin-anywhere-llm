@@ -1,12 +1,13 @@
 from typing import Dict, List, Any
+from ..config import llm_config
+
 class LLMParams:
     """模型基础参数配置"""
     def __init__(
         self,
-        model: str = "Qwen/Qwen2.5-7B-Instruct",
+        model: str = llm_config.openai_model,
         temperature: float = 0.7,
         max_tokens: int = 2000,
-        # top_p: float = 1.0,
         frequency_penalty: float = 0.0,
         presence_penalty: float = 0.0,
         system_prompt: str = None
