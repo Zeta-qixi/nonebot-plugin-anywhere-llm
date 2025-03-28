@@ -1,1 +1,1 @@
-from .llm_time import llm_system_time
+from .logging import logger

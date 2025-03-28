@@ -1,50 +1,88 @@
+import random
+
 from nonebot import get_driver, require
 from typing import Dict, List, Optional, Union
-from nonebot.adapters import Event
+from nonebot.adapters.onebot.v11 import MessageEvent, GroupMessageEvent
 
+from .message_handling import MessageHandler
 from .provider import OpenAIProvider
-from .history_manager import SQLiteHistoryManager
-from .models import LLMParams
+from .config import LLMParams
 
 # LLMService.py
 
 class LLMService:
-    def __init__(self, llm_param = None, history_mgr= None):
-        
-        self.provider = OpenAIProvider()
+    def __init__(
+        self, llm_param: LLMParams = None, 
+        message_handle: MessageHandler = None
+    ):
+           
         self.param = llm_param or LLMParams()
-        self.history_mgr = history_mgr or SQLiteHistoryManager()
+        self.message_handle = message_handle or MessageHandler()
+        
+        self.provider = OpenAIProvider(self.param)
+        
 
 
     async def generate(
+            self,
+            input: str,
+            event: MessageEvent = None,
+            save: bool = False,
+            use_histroy: int = 0,
+            histroy_time: int = 0, 
+            **param
+        ) -> str:
+            
+            self.param.update(**param)
+            session_id = event.get_session_id() if event else 'default'
+            messages = await self.message_handle.process_message(session_id, input, use_histroy, histroy_time)
+            response = await self.provider.generate(
+                messages = messages,
+                params = self.param
+            )
+            if save:
+                await self.message_handle.save_message(session_id, 'assistant' , response)
+            return response
+
+
+
+    async def chat(
+            self,
+            input: str,
+            event: MessageEvent,
+            use_histroy: int = 10,
+            histroy_time: int = 3600, 
+            **param
+        ) -> str:
+        
+            self.param.update(param)
+            session_id = event.get_session_id()
+            messages = await self.message_handle.process_message(session_id, input, use_histroy, histroy_time)
+            response = await self.provider.generate(
+                messages = messages,
+                params = self.param
+            )
+            await self.message_handle.save_message(session_id, 'assistant' , response)
+            return response
+
+
+    async def group_chat(
         self,
         prompt: str,
-        param: LLMParams = None,
-        session_id: str = None,
-        event: Event = None,
-        use_histroy: bool = False,
-        histroy_length: int = 10
+        event: GroupMessageEvent,
+        use_histroy: int = 30,
+        histroy_time: int = 300, 
+        probability : float = 0.5, # 回复概率
+        **param
+
     ) -> str:
-
-        self.param = param or self.param
-        messages = self.param.get_system_prompt() or []
-
-        if use_histroy:
-            if (session_id is None or session_id.strip() == '') and event is None:
-                raise ValueError("当use_history为True时, session_id和event不能同时为空")
-            session_id = session_id or event.get_session_id()
-            histroy = await self.history_mgr.get_history(session_id, length=histroy_length)
-            messages.extend(histroy)
-            
-        messages.append({"role": 'user', 'content': prompt})
         
+        self.param.update(param)
+        session_id = event.group_id()
+        messages = await self.message_handle.process_message(session_id, input, use_histroy, histroy_time)
         response = await self.provider.generate(
             messages = messages,
             params = self.param
         )
-        if use_histroy:
-            await self.history_mgr.save_message(session_id, 'user', prompt)
-            await self.history_mgr.save_message(session_id, 'system', response)
-            
+        await self.message_handle.save_message(session_id, 'assistant' , response)
         return response
-

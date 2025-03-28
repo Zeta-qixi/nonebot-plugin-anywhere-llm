@@ -1,22 +1,21 @@
 from .interface import BaseLLMProvider
-from ..models import LLMParams
+from ..config import LLMParams
 from openai import APIError, APITimeoutError, AsyncOpenAI, AuthenticationError
 from nonebot import  logger
 from typing import Any, List, Tuple
-from ..config import llm_config
-
+from ..config import LLMParams
 class OpenAIProvider(BaseLLMProvider):
-    def __init__(self, api_key: str = None, base_url: str = None):
+    def __init__(self, llm_param: LLMParams):
         
         self.client = AsyncOpenAI(
-            api_key = api_key or llm_config.openai_api_key, 
-            base_url = base_url or llm_config.openai_base_url
+            api_key = llm_param.api_key, 
+            base_url = llm_param.base_url
         )
       
 
 
     async def generate(self, messages: List[Tuple[str, str]], params: LLMParams) -> str:
-        
+        print(messages[1:])
         try:
             response = await self.client.chat.completions.create(
                 messages=messages,
