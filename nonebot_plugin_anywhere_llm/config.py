@@ -1,6 +1,12 @@
 from typing import Dict, List, Any
 from pydantic import BaseModel, Field
 from nonebot import get_plugin_config, get_driver
+from nonebot import require
+require("nonebot_plugin_localstore")
+import nonebot_plugin_localstore as store
+
+DATA_DIR = store.get_plugin_data_dir()
+DB_PATH = store.get_plugin_data_file("history.db")
 
 
 class Config(BaseModel):

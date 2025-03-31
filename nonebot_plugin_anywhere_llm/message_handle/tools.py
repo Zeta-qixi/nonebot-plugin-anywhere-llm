@@ -1,8 +1,8 @@
 from pathlib import Path
+from ..config import DATA_DIR
 
 
-
-def load_template( name: str, template_dir: str = "data/llm") -> str:
+def load_template( name: str, template_dir: str = DATA_DIR) -> str:
     """
     从模板目录加载模板文件，自动匹配 .md、.txt 或无扩展名文件
     

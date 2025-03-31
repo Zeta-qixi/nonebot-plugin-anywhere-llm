@@ -1,7 +1,8 @@
 from .llm_service import LLMService
-from .message_handling import *
+from .message_handle import *
 from .config import Config, LLMParams
 from nonebot.plugin import PluginMetadata
+
 
 __plugin_meta__ = PluginMetadata(
     name="nonebot-plugin-anywhere-llm",

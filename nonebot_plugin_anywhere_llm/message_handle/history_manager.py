@@ -5,13 +5,10 @@ from typing import List, Dict
 from abc import ABC, abstractmethod
 from collections import defaultdict
 from typing import List, Dict
-import os
 from asyncio import Lock
 
 
-os.makedirs('data/llm', exist_ok=True)
 
-YEAR = 31536000
 # 核心接口
 class IHistoryManager(ABC):
     
@@ -19,11 +16,11 @@ class IHistoryManager(ABC):
     def __init__(
         self, 
         default_length: int = 10, 
-        default_seconds: int = YEAR,
+        default_time: int = 3600 * 24,
         auto_save: bool = True  
     ):
         self.default_length = default_length
-        self.default_seconds = default_seconds
+        self.default_time = default_time
         self.auto_save = auto_save 
         
         
@@ -52,11 +49,11 @@ class MemoryHistoryManager(IHistoryManager):
     def __init__(
         self, 
         default_length: int = 10, 
-        default_seconds: int = YEAR,
+        default_time: int = 3600 * 24,
         auto_save: bool = True,
         max_history_tokens: int = 2000
     ):
-        super().__init__(default_length, default_seconds, auto_save)
+        super().__init__(default_length, default_time, auto_save)
         self.max_history_tokens = max_history_tokens
         self.histories = defaultdict(list)
         self.token_counts = defaultdict(int)
@@ -90,7 +87,7 @@ class MemoryHistoryManager(IHistoryManager):
     ) -> List[Dict[str, str]]:
         
         length = length or self.default_length
-        seconds = seconds or self.default_seconds
+        seconds = seconds or self.default_time
         
         result = []
         history = self.histories.get(session_id, [])
@@ -120,11 +117,11 @@ class SQLiteHistoryManager(IHistoryManager):
     def __init__(self, 
         db_path: str = "data/llm/history.db",
         default_length: int = 10,
-        default_seconds: int = YEAR,
+        default_time: int = 3600 * 24,
         auto_save: bool = True
     ):
         
-        super().__init__(default_length, default_seconds, auto_save)
+        super().__init__(default_length, default_time, auto_save)
         self.write_lock = Lock()
         self.db_path = db_path
         self.init_db()
@@ -164,7 +161,7 @@ class SQLiteHistoryManager(IHistoryManager):
     ) -> List[Dict[str, str]]:
         
         length = length or self.default_length
-        seconds = seconds or self.default_seconds
+        seconds = seconds or self.default_time
 
         async with aiosqlite.connect(self.db_path) as db:
             cursor = await db.execute(

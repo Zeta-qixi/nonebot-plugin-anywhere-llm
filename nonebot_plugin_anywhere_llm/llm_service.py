@@ -1,26 +1,39 @@
 import random
-
-from nonebot import get_driver, require
-from typing import Dict, List, Optional, Union
 from nonebot.adapters.onebot.v11 import MessageEvent, GroupMessageEvent
 
-from .message_handling import MessageHandler
+from .message_handle import MessageHandler, PromptTemplate
 from .provider import OpenAIProvider
 from .config import LLMParams
 
-# LLMService.py
 
+def get_provider_class(**kwargs):
+    # TODO
+    ...
+
+# LLMService.py
 class LLMService:
     def __init__(
-        self, llm_param: LLMParams = None, 
-        message_handle: MessageHandler = None
+        self, 
+        message_handle: MessageHandler = None,
+        llm_param: LLMParams = None, 
     ):
            
         self.param = llm_param or LLMParams()
         self.message_handle = message_handle or MessageHandler()
-        
         self.provider = OpenAIProvider(self.param)
         
+    @classmethod
+    def from_config(cls, config: dict):
+        # TODO
+        """通过配置字典快速初始化"""
+        llm_config = config.get('llm_params', {})
+        msg_config = config.get('message_handle', {})
+        
+        return cls(
+            llm_param=LLMParams(**llm_config),
+            message_handle=MessageHandler.from_config(msg_config),
+            provider_class=get_provider_class(llm_config.get('provider'))
+        )
 
 
     async def generate(
@@ -48,16 +61,16 @@ class LLMService:
 
     async def chat(
             self,
-            input: str,
+            user_input: str,
             event: MessageEvent,
             use_histroy: int = 10,
             histroy_time: int = 3600, 
             **param
         ) -> str:
         
-            self.param.update(param)
+            self.param.update(**param)
             session_id = event.get_session_id()
-            messages = await self.message_handle.process_message(session_id, input, use_histroy, histroy_time)
+            messages = await self.message_handle.process_message(session_id, user_input, use_histroy, histroy_time)
             response = await self.provider.generate(
                 messages = messages,
                 params = self.param
@@ -68,7 +81,7 @@ class LLMService:
 
     async def group_chat(
         self,
-        prompt: str,
+        user_input: str|PromptTemplate,
         event: GroupMessageEvent,
         use_histroy: int = 30,
         histroy_time: int = 300, 
@@ -76,13 +89,14 @@ class LLMService:
         **param
 
     ) -> str:
+        self.param.update(**param)
+        session_id = event.group_id
+        messages = await self.message_handle.process_message(session_id, user_input, use_histroy, histroy_time)
         
-        self.param.update(param)
-        session_id = event.group_id()
-        messages = await self.message_handle.process_message(session_id, input, use_histroy, histroy_time)
-        response = await self.provider.generate(
-            messages = messages,
-            params = self.param
-        )
-        await self.message_handle.save_message(session_id, 'assistant' , response)
-        return response
+        if probability>=random.random():
+            response = await self.provider.generate(
+                messages = messages,
+                params = self.param
+            )
+            await self.message_handle.save_message(session_id, 'assistant' , response)
+            return response

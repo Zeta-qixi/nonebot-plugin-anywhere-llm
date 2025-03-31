@@ -1,7 +1,7 @@
 
 [tool.poetry]
 name = "nonebot-plugin-anywhere-llm"
-version = "0.5.2"
+version = "0.6.5"
 authors = ["Zeta-qixi <1019289695@qq.com>"]
 description = "Nonebot2 plugin for using llm"
 readme = "README.md"

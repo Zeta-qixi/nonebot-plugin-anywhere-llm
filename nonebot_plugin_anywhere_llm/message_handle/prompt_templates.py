@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from string import Template
 from typing import Dict
-import re
+
 class PromptTemplate(ABC):
-    """模板基类"""
+    """Prompt模板基类"""
     @abstractmethod
     def render(self) -> Dict[str, str]:
         pass

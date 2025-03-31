@@ -1,19 +1,29 @@
-from typing import Dict, List, Optional, Callable
+from typing import Dict, List, Callable
 
-from .history_manager import IHistoryManager, SQLiteHistoryManager
+from .history_manager import SQLiteHistoryManager
 from .prompt_templates import PromptTemplate, SystemPromptTemplate
 from .injectors import InformationInjector, create_time_injector, create_weather_injector
+from ..config import DB_PATH
+
 
 
 class MessageHandler:
     def __init__(
         self,
-        history_mgr: IHistoryManager = None,
         system_prompt: str = '你是一个猫娘',  
         set_time: int = 0, 
-        set_weather: int = 0
+        set_weather: int = 0,
+        db_path: str = DB_PATH,
+        history_length: int = 10,
+        time_window: int = 3600,
+        auto_save: bool = True
     ):
-        self.history_mgr = history_mgr or SQLiteHistoryManager()
+        self.history_mgr = SQLiteHistoryManager(
+            db_path=db_path,
+            default_length=history_length,
+            default_time=time_window,
+            auto_save=auto_save
+        )
         self.system_prompt = SystemPromptTemplate(system_prompt) 
         self.injector = InformationInjector()
         self.set_injector(set_time, set_weather)

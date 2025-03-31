@@ -3,7 +3,6 @@ from ..config import LLMParams
 from openai import APIError, APITimeoutError, AsyncOpenAI, AuthenticationError
 from nonebot import  logger
 from typing import Any, List, Tuple
-from ..config import LLMParams
 class OpenAIProvider(BaseLLMProvider):
     def __init__(self, llm_param: LLMParams):
         
@@ -15,7 +14,7 @@ class OpenAIProvider(BaseLLMProvider):
 
 
     async def generate(self, messages: List[Tuple[str, str]], params: LLMParams) -> str:
-        print(messages[1:])
+
         try:
             response = await self.client.chat.completions.create(
                 messages=messages,
