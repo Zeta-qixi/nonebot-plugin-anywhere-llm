@@ -12,6 +12,7 @@ homepage = "https://github.com/Zeta-qixi/nonebot-plugin-anywhere-llm"
 python = "^3.9"
 nonebot2 = "^2.4.1"
 nonebot-adapter-onebot="^2.4.3"
+nonebot-plugin-localstore="^0.7.4"
 aiosqlite="^0.21.0"
 openai="^1.55.3"
 
