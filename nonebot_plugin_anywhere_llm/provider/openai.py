@@ -3,18 +3,19 @@ from ..config import LLMParams
 from openai import APIError, APITimeoutError, AsyncOpenAI, AuthenticationError
 from nonebot import  logger
 from typing import Any, List, Tuple
+
+
 class OpenAIProvider(BaseLLMProvider):
-    def __init__(self, llm_param: LLMParams):
+    def __init__(self):
+        ...
+      
+    async def generate(self, messages: List[Tuple[str, str]], params: LLMParams) -> str:
         
         self.client = AsyncOpenAI(
-            api_key = llm_param.api_key, 
-            base_url = llm_param.base_url
+            api_key = params.api_key, 
+            base_url = params.base_url
         )
-      
-
-
-    async def generate(self, messages: List[Tuple[str, str]], params: LLMParams) -> str:
-
+        
         try:
             response = await self.client.chat.completions.create(
                 messages=messages,
@@ -38,3 +39,5 @@ class OpenAIProvider(BaseLLMProvider):
         except Exception as e:
             logger.error(f"未处理异常: {e}")
             raise "⚠️服务内部错误"
+
+openai_provider = OpenAIProvider()

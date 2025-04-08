@@ -1,12 +1,19 @@
-from typing import Dict, List, Any
+from pathlib import Path
 from pydantic import BaseModel, Field
-from nonebot import get_plugin_config, get_driver
+from nonebot import get_plugin_config
 from nonebot import require
+
+from pydantic import BaseModel, Field, PositiveInt
+from typing import Literal, Dict
+
 require("nonebot_plugin_localstore")
 import nonebot_plugin_localstore as store
 
 DATA_DIR = store.get_plugin_data_dir()
+Config_DIR = store.get_plugin_config_dir()
 DB_PATH = store.get_plugin_data_file("history.db")
+AVATAT_DIR = DATA_DIR / 'avatar'
+TEMPLATE_DIR = DATA_DIR /'template'
 
 
 class Config(BaseModel):
@@ -19,31 +26,54 @@ llm_config = get_plugin_config(Config)
 
 
 
-
-class LLMParams:
+class LLMParams(BaseModel):
     """模型基础参数配置"""
-    def __init__(
-        self,
-        api_key: str = llm_config.openai_api_key,
-        base_url: str = llm_config.openai_base_url,
-        model: str = llm_config.openai_model,
-        temperature: float = 0.7,
-        max_tokens: int = 2000,
-        frequency_penalty: float = 0.0,
-        presence_penalty: float = 0.0,
-
-    ):
-        self.model = model
-        self.api_key = api_key
-        self.base_url = base_url
-        self.temperature = temperature
-        self.max_tokens = max_tokens
-        self.frequency_penalty = frequency_penalty
-        self.presence_penalty = presence_penalty
+    api_key: str = llm_config.openai_api_key
+    base_url: str = llm_config.openai_base_url
+    model: str = llm_config.openai_model
+    temperature: float = 0.7
+    max_tokens: int = 2000
+    frequency_penalty: float = 0.0
+    presence_penalty: float = 0.0
         
-    def update(self, **kwargs):
-        for key, value in kwargs.items():
-            if hasattr(self, key):
-                setattr(self, key, value)
-            else:
-                raise AttributeError(f"'{self.__class__.__name__}'对象没有属性'{key}'")
+
+class PromptInjectionConfig(BaseModel):
+    """提示词注入配置"""
+    time: Literal[0, 1, 2, 3] = Field(0, description="是否注入时间（0=关闭，1=开启）")
+    weather: Literal[0, 1] = Field(0, description="是否注入天气（0=关闭，1=开启）")
+    
+    
+class HistoryConfig(BaseModel):
+    """ History 配置"""
+    db_path: str = DB_PATH
+    max_length: PositiveInt = Field(10, gt=0, description="最大历史记录条数")
+    time_window: PositiveInt = Field(86400, description="历史记录时间窗口（秒）")
+    
+
+
+class SystemPromptConfig(BaseModel):
+    """系统提示配置"""
+    template: str = Field(
+        "你是一个由openai公司开发的大模型gpt",
+        description="基础提示词模板"
+    )
+    
+
+class MessagesConfig(BaseModel):
+    
+    history: HistoryConfig = Field(default_factory=HistoryConfig)
+    system_prompt: SystemPromptConfig = Field(default_factory=SystemPromptConfig)
+    injections: PromptInjectionConfig = Field(default_factory=PromptInjectionConfig)
+    
+    
+class AppConfig(BaseModel):
+    """聚合应用配置"""
+    params: LLMParams = Field(default_factory=LLMParams)
+    messages: MessagesConfig = Field(default_factory=MessagesConfig)
+    
+        
+
+
+    
+    
+    

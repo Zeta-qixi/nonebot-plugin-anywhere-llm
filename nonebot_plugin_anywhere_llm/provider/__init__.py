@@ -1,1 +1,1 @@
-from .openai import OpenAIProvider
+from .openai import openai_provider
