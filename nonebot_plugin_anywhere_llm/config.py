@@ -1,4 +1,3 @@
-from pathlib import Path
 from pydantic import BaseModel, Field
 from nonebot import get_plugin_config
 from nonebot import require
@@ -11,10 +10,11 @@ import nonebot_plugin_localstore as store
 
 DATA_DIR = store.get_plugin_data_dir()
 Config_DIR = store.get_plugin_config_dir()
-DB_PATH = store.get_plugin_data_file("history.db")
 AVATAT_DIR = DATA_DIR / 'avatar'
 TEMPLATE_DIR = DATA_DIR /'template'
-
+DB_PATH = store.get_plugin_data_file("history.db")
+for path in [AVATAT_DIR, TEMPLATE_DIR]:
+    path.mkdir(parents=True, exist_ok=True)
 
 class Config(BaseModel):
 
@@ -39,13 +39,13 @@ class LLMParams(BaseModel):
 
 class PromptInjectionConfig(BaseModel):
     """提示词注入配置"""
-    time: Literal[0, 1, 2, 3] = Field(0, description="是否注入时间（0=关闭，1=开启）")
-    weather: Literal[0, 1] = Field(0, description="是否注入天气（0=关闭，1=开启）")
+    time: Literal[0, 1, 2, 3] = 1
+    weather: Literal[0, 1] = 0
     
     
 class HistoryConfig(BaseModel):
     """ History 配置"""
-    db_path: str = DB_PATH
+    db_path: str = str(DB_PATH)
     max_length: PositiveInt = Field(10, gt=0, description="最大历史记录条数")
     time_window: PositiveInt = Field(86400, description="历史记录时间窗口（秒）")
     
@@ -57,6 +57,8 @@ class SystemPromptConfig(BaseModel):
         "你是一个由openai公司开发的大模型gpt",
         description="基础提示词模板"
     )
+    class Config:
+        extra = 'allow'
     
 
 class MessagesConfig(BaseModel):

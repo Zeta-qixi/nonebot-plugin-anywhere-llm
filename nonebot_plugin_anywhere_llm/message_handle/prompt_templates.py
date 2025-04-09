@@ -13,7 +13,7 @@ class DefaultDict(dict):
         try:
             return super().__getitem__(key)
         except KeyError:
-            logger.warn(f"Key '{key}' is missing, replaced with empty string")
+            logger.warning(f"Key '{key}' is missing, replaced with empty string")
             return ''
         
         
@@ -45,12 +45,15 @@ class PromptTemplate(ABC):
     @staticmethod
     def load_template(template: str, dir: Path) -> str:
         """加载模板内容，处理文件路径或直接返回模板字符串"""
-        
-        for ext in ['.md', '.txt', '']:
-            for file in [dir/(template+ext), Path(template+ext)]:
-                if file.is_file():
-                    logger.info(f'加载模板成功: {file}')
-                    return file.read_text( encoding="utf-8")
+        if len(template) <= 20:
+            for ext in ['.md', '.txt', '']:
+                for file in [dir/(template+ext), Path(template+ext)]:
+                    try:
+                        if file.is_file():
+                            logger.info(f'加载模板成功: {file}')
+                            return file.read_text( encoding="utf-8")
+                    except Exception as e:
+                        ...
         return template
 
 

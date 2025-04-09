@@ -1,47 +1,43 @@
 from typing import Dict, List, Callable
-
 from .history_manager import SQLiteHistoryManager
-from .prompt_templates import PromptTemplate, SystemPromptTemplate
+from .prompt_templates import  SystemPromptTemplate
 from .injectors import InformationInjector, create_time_injector, create_weather_injector
-from ..config import MessagesConfig
+from ..config import MessagesConfig, PromptInjectionConfig
 
 
 class MessageHandler:
     def __init__(self, config: MessagesConfig):
         
         self.history_mgr = SQLiteHistoryManager(
-            db_path=config.history.db_path       
-        )
+            db_path=config.history.db_path)
         self.system_prompt = SystemPromptTemplate(
-            config.system_prompt
-        )
+            config.system_prompt)
         self.injector = InformationInjector()
-        self._setup_injectors(config.system_prompt)
+        self._setup_injectors(config.injections)
         
-        self.histroy_length=config.history.max_history_length
-        self.histroy_time=config.history.time_window_seconds
+        self.histroy_length=config.history.max_length
+        self.histroy_time=config.history.time_window
 
 
-
-    def set_injector(self, time_injection_level: int, weather_injection: int):
+    def _setup_injectors(self, config: PromptInjectionConfig):
         """配置信息注入器
         
         Args:
             time_level: 时间信息等级
                 0: 不注入
-                1: 基础时间
-                2: 日期+季节
-                3: 节日信息（待实现）
+                1: 基础时间 2: 日期+季节 3: 节日信息（待实现）
             weather_level: 天气信息等级
                 0: 不注入
                 1: 基础天气
         """
-        self.injector.register_injector(
-            'time', 
-            create_time_injector(time_injection_level))
-        self.injector.register_injector(
-            'weather', 
-            create_weather_injector(weather_injection))
+        if config.time:
+            self.injector.register_injector(
+                'time', 
+                create_time_injector(config.time))
+        if config.weather:
+            self.injector.register_injector(
+                'weather', 
+                create_weather_injector(config.weather))
 
 
     def add_injector(self, func: Callable[[str], str], priority):
@@ -53,13 +49,13 @@ class MessageHandler:
         
     async def process_message(
         self,
+        session_id: str,
         user_input: str,
     ) -> List[Dict[str, str]]:
         
-
+        self.injector.inject(self.system_prompt) 
         system_prompt = self.system_prompt.render()
-        self.injector.inject(system_prompt) 
-        histroy = await self.history_mgr.get_history(self.histroy_length, self.histroy_time)
+        histroy = await self.history_mgr.get_history(session_id, self.histroy_length, self.histroy_time)
         user_input = {'role': 'user', 'content': user_input}
         messages = [system_prompt] + histroy + [user_input]
         

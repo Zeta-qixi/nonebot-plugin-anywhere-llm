@@ -66,8 +66,8 @@ class SQLiteHistoryManager(IHistoryManager):
         session_id: str, length: int, seconds: int
     ) -> List[Dict[str, str]]:
         
-        length = length or self.default_length
-        seconds = seconds or self.default_time
+        if not length:
+            return []
 
         async with aiosqlite.connect(self.db_path) as db:
             cursor = await db.execute(
@@ -87,6 +87,5 @@ class SQLiteHistoryManager(IHistoryManager):
 
 __all__ = [
     "IHistoryManager",
-    "MemoryHistoryManager",
     "SQLiteHistoryManager", 
 ]

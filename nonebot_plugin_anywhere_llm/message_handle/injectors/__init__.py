@@ -37,8 +37,7 @@ def llm_system_time() -> str:
 
 def create_time_injector(option: int) -> Callable[[str], str]:
     def time_injector() -> str:
-        assert option != 0, '跳过时间注入'
-       
+        
         now = datetime.now()
         if option == 1:
             context = now.strftime("%H:%M")
@@ -56,8 +55,6 @@ def get_weather():
 
 def create_weather_injector(option: int) -> Callable[[str], str]:
     def weather_injector() -> str:
-        assert option != 0, '跳过天气注入'
-
         return get_weather()
     
     return weather_injector
