@@ -5,7 +5,7 @@ from typing import Dict, Any
 from nonebot.adapters.onebot.v11 import MessageEvent, GroupMessageEvent
 
 from .message_handle import MessageHandler, PromptTemplate
-from .config import AppConfig, Config_DIR
+from .config import AppConfig, Config_DIR, deep_update_model
 from .provider import openai_provider
 
 
@@ -25,25 +25,22 @@ def _flatten_dict(data: Dict, parent_key: str = '') -> list:
 # LLMService.py
 class LLMService:
     def __init__(self,config: AppConfig = None):
-        self._config = config or AppConfig()     
+        self.config = config or AppConfig()     
 
     @classmethod
     def load(cls, file_name: str | Path) -> 'LLMService':
         file_path = Config_DIR / file_name
         with open(file_path) as f:
             data = yaml.safe_load(f)
-        return cls(AppConfig().model_copy(update=data))
+        config = deep_update_model(AppConfig(), data)
+        return cls(config = config)
 
-    def __getattr__(self, name: str) -> 'LLMService':
-            """实现链式调用"""
-            if hasattr(self._config, name):
-                self._current_path = getattr(self._config, name)
-                return self
-            raise AttributeError(f"无效配置项: {name}")
+
+
         
     def to_dict(self) -> Dict:
         """导出为字典"""
-        return self._config.model_dump()
+        return self.config.model_dump()
 
     def save(self, file_name: str | Path) -> None:
         data = self.to_dict()
@@ -57,10 +54,6 @@ class LLMService:
                 sort_keys=False
             )
 
-    @property
-    def config(self) -> AppConfig:
-        return self._config
-        
         
     async def generate(
             self,

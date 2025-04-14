@@ -2,8 +2,8 @@ from pydantic import BaseModel, Field
 from nonebot import get_plugin_config
 from nonebot import require
 
-from pydantic import BaseModel, Field, PositiveInt
-from typing import Literal, Dict
+from pydantic import BaseModel, Field
+from typing import Any, Literal, Dict
 
 require("nonebot_plugin_localstore")
 import nonebot_plugin_localstore as store
@@ -46,8 +46,8 @@ class PromptInjectionConfig(BaseModel):
 class HistoryConfig(BaseModel):
     """ History 配置"""
     db_path: str = str(DB_PATH)
-    max_length: PositiveInt = Field(10, gt=0, description="最大历史记录条数")
-    time_window: PositiveInt = Field(86400, description="历史记录时间窗口（秒）")
+    max_length: int = 10
+    time_window: int = Field(86400, description="历史记录时间窗口(s)")
     
 
 
@@ -72,10 +72,14 @@ class AppConfig(BaseModel):
     """聚合应用配置"""
     params: LLMParams = Field(default_factory=LLMParams)
     messages: MessagesConfig = Field(default_factory=MessagesConfig)
-    
-        
 
 
-    
-    
-    
+def deep_update_model(model: BaseModel, update_data: dict[str, Any]) -> BaseModel:
+    update_dict = model.model_dump()
+    for key, value in update_data.items():
+        if isinstance(value, dict) and isinstance(update_dict.get(key), BaseModel):
+            # 递归更新嵌套的 BaseModel
+            update_dict[key] = deep_update_model(update_dict[key], value)
+        else:
+            update_dict[key] = value
+    return model.__class__(**update_dict)
