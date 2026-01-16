@@ -53,7 +53,7 @@ async def _():
 # --- 对外核心接口 ---
 from .services.bridge import chat_service
 
-async def simple_chat(
+async def llm_chat(
     user_id: str, 
     group_id: str, 
     workspace_name: str, 
@@ -82,3 +82,28 @@ async def simple_chat(
             await db.rollback()
             raise e
             
+
+async def simple_chat(
+    workspace_name: str, 
+    prompt: str
+) -> str:
+    """
+    [对外接口] 一键对话函数。
+    自动管理数据库连接生命周期，调用者无需关心 DB。
+    """
+    # 1. 在函数内部创建 Session
+    async with AsyncSessionLocal() as db:
+        try:
+            # 2. 调用核心业务逻辑 (复用 bridge.py)
+            response = await chat_service(
+                db=db, 
+                workspace_name=workspace_name, 
+                prompt=prompt
+            )
+            
+            await db.commit()
+            return response
+            
+        except Exception as e:
+            await db.rollback()
+            raise e
