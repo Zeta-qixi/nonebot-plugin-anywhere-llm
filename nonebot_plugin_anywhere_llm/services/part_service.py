@@ -11,20 +11,20 @@ async def create_part(db: AsyncSession, data: PartCreate):
 
   
     final_value = data.value
-
-
     if not mod:
         part = ModelPart(
             id=data.id,
             name=data.name,
             type=data.type,
+            remark=data.remark,
             value=final_value
         )
         db.add(part)
     else:
         mod.name = data.name
         mod.type = data.type
-        mod.value = final_value # 更新时也需要加密
+        mod.remark = data.remark
+        mod.value = final_value
 
     try:
         await db.commit()

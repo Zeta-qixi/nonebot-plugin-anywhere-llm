@@ -7,6 +7,7 @@ class ModuleCreate(BaseModel):
     id: str
     name: str
     type: str
+    remark: Optional[str] = None
     content: Optional[str] = None
 
 class ModuleResponse(ModuleCreate):
@@ -18,6 +19,7 @@ class PartCreate(BaseModel):
     name: str
     type: str
     value: str
+    remark: Optional[str] = None 
 
 class PartResponse(PartCreate):
     pass

@@ -23,7 +23,7 @@ async def list_parts(db: AsyncSession = Depends(get_db_session)):
     results = []
     for p in parts:
         val = "******" if p.type == "TOKEN" else p.value
-        results.append(PartResponse(id=p.id, name=p.name, type=p.type, value=val))
+        results.append(PartResponse(id=p.id, name=p.name, type=p.type, value=val, remark=p.remark))
     return results
 
 @router.delete("/{part_id}", status_code=204)

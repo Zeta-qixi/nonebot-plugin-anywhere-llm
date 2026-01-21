@@ -18,17 +18,19 @@ async def create_module(db: AsyncSession, data: ModuleCreate):
             id=data.id,
             name=data.name,
             type=data.type,
-            content=data.content
+            content=data.content,
+            remark=data.remark
         )
         db.add(mod)
     else:
         mod.name = data.name
         mod.type = data.type
         mod.content = data.content
+        mod.remark = data.remark
 
     try:
         await db.commit()
-        await db.refresh(mod) # 刷新以获取最新状态
+        await db.refresh(mod) 
     except IntegrityError:
         await db.rollback()
         raise ValueError("Module save failed")

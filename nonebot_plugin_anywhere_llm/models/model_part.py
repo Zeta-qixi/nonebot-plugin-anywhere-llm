@@ -7,4 +7,5 @@ class ModelPart(Base):
     name = Column(String(100), nullable=False)
     type = Column(String(32), nullable=False)
     value = Column(Text, nullable=False)
+    remark = Column(Text, nullable=True)
     created_at = Column(DateTime, server_default=func.now())
